@@ -16,7 +16,7 @@
     "url": "https://github.com/WhiteDevil-rss/CodeShot.git"
   },
   "categories": [
-    "Other"
+    "Snippets"
   ],
   "activationEvents": [],
   "main": "./out/extension.js",

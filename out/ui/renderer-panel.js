@@ -115,13 +115,25 @@ class RendererPanel {
     }
     _getHtmlForWebview(selection) {
         const prismJsUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'prism-bundle.min.js'));
-        const prismCssUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'prism-theme.min.css'));
         const html2canvasUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'html2canvas.min.js'));
         const languageMap = {
             'js': 'javascript',
             'ts': 'typescript',
             'py': 'python',
-            'md': 'markdown'
+            'md': 'markdown',
+            'c': 'clike',
+            'h': 'clike',
+            'cpp': 'cpp',
+            'hpp': 'cpp',
+            'cs': 'csharp',
+            'java': 'java',
+            'php': 'php',
+            'rb': 'ruby',
+            'go': 'go',
+            'rs': 'rust',
+            'sql': 'sql',
+            'html': 'markup',
+            'xml': 'markup'
         };
         const language = languageMap[selection.languageId] || selection.languageId;
         const lines = selection.text.split('\n');
@@ -132,10 +144,12 @@ class RendererPanel {
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <link rel="stylesheet" href="${prismCssUri}">
                 <script src="${prismJsUri}"></script>
                 <script src="${html2canvasUri}"></script>
                 <style>
+                    /* Prism Okaidia Theme Embedded */
+                    code[class*=language-],pre[class*=language-]{color:#f8f8f2;background:0 0;text-shadow:0 1px rgba(0,0,0,.3);font-family:Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace;font-size:1em;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto;border-radius:.3em}:not(pre)>code[class*=language-],pre[class*=language-]{background:transparent !important}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal}.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#8292a2}.token.punctuation{color:#f8f8f2}.token.namespace{opacity:.7}.token.constant,.token.deleted,.token.property,.token.symbol,.token.tag{color:#f92672}.token.boolean,.token.number{color:#ae81ff}.token.attr-name,.token.builtin,.token.char,.token.inserted,.token.selector,.token.string{color:#a6e22e}.token.entity,.token.operator,.token.url,.token.variable{color:#f8f8f2}.token.atrule,.token.attr-value,.token.class-name,.token.function{color:#e6db74}.token.keyword{color:#66d9ef}.token.important,.token.regex{color:#fd971f}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}
+
                     body {
                         background-color: #0d0d0d;
                         margin: 0;
@@ -367,7 +381,12 @@ class RendererPanel {
                             const lineNumbers = document.querySelector('.line-numbers');
                             
                             // Update dynamic language classes
-                            const lang = message.languageId; // Simplified map could be added here too
+                            const languageMap = {
+                                'js': 'javascript', 'ts': 'typescript', 'py': 'python', 'md': 'markdown',
+                                'c': 'clike', 'cpp': 'cpp', 'cs': 'csharp', 'java': 'java',
+                                'php': 'php', 'go': 'go', 'rs': 'rust', 'sql': 'sql'
+                            };
+                            const lang = languageMap[message.languageId] || message.languageId;
                             preElement.className = 'language-' + lang;
                             codeElement.className = 'language-' + lang;
 
@@ -388,6 +407,19 @@ class RendererPanel {
                             setTimeout(updateScale, 50);
                         }
                     });
+
+                    // Trigger highlight on initial load
+                    document.addEventListener('DOMContentLoaded', () => {
+                        if (window.Prism) {
+                            Prism.highlightAll();
+                        }
+                    });
+                    
+                    // Fallback for immediate highlight if DOMContentLoaded already fired
+                    setTimeout(() => {
+                        if (window.Prism) Prism.highlightAll();
+                        updateScale();
+                    }, 100);
 
                     function updateScale() {
                         const wrapper = document.getElementById('scaler-wrapper');
