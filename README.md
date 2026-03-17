@@ -1,4 +1,4 @@
-# CodeShot 📸
+# CodeShot Pro 📸
 
 **CodeShot** is a premium VS Code extension designed to create beautiful, high-fidelity source code screenshots instantly. Elevate your code sharing experience for social media, documentation, and presentations.
 
