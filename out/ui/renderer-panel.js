@@ -118,22 +118,30 @@ class RendererPanel {
         const html2canvasUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'html2canvas.min.js'));
         const languageMap = {
             'js': 'javascript',
+            'javascript': 'javascript',
             'ts': 'typescript',
+            'typescript': 'typescript',
             'py': 'python',
+            'python': 'python',
             'md': 'markdown',
+            'markdown': 'markdown',
             'c': 'clike',
-            'h': 'clike',
             'cpp': 'cpp',
-            'hpp': 'cpp',
+            'csharp': 'csharp',
             'cs': 'csharp',
             'java': 'java',
             'php': 'php',
-            'rb': 'ruby',
             'go': 'go',
             'rs': 'rust',
+            'rust': 'rust',
             'sql': 'sql',
             'html': 'markup',
-            'xml': 'markup'
+            'xml': 'markup',
+            'css': 'css',
+            'json': 'javascript', // Fallback to JS for JSON if needed
+            'yaml': 'yaml',
+            'sh': 'bash',
+            'bash': 'bash'
         };
         const language = languageMap[selection.languageId] || selection.languageId;
         const lines = selection.text.split('\n');
@@ -147,8 +155,39 @@ class RendererPanel {
                 <script src="${prismJsUri}"></script>
                 <script src="${html2canvasUri}"></script>
                 <style>
-                    /* Prism Okaidia Theme Embedded */
-                    code[class*=language-],pre[class*=language-]{color:#f8f8f2;background:0 0;text-shadow:0 1px rgba(0,0,0,.3);font-family:Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace;font-size:1em;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto;border-radius:.3em}:not(pre)>code[class*=language-],pre[class*=language-]{background:transparent !important}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal}.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#8292a2}.token.punctuation{color:#f8f8f2}.token.namespace{opacity:.7}.token.constant,.token.deleted,.token.property,.token.symbol,.token.tag{color:#f92672}.token.boolean,.token.number{color:#ae81ff}.token.attr-name,.token.builtin,.token.char,.token.inserted,.token.selector,.token.string{color:#a6e22e}.token.entity,.token.operator,.token.url,.token.variable{color:#f8f8f2}.token.atrule,.token.attr-value,.token.class-name,.token.function{color:#e6db74}.token.keyword{color:#66d9ef}.token.important,.token.regex{color:#fd971f}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}
+                    /* Premium Syntax Highlighting - Optimized for Capture */
+                    code[class*="language-"], 
+                    pre[class*="language-"] {
+                        color: #f8f8f2;
+                        background: none !important;
+                        font-family: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace;
+                        font-size: 14px;
+                        direction: ltr;
+                        text-align: left;
+                        white-space: pre;
+                        word-spacing: normal;
+                        word-break: normal;
+                        line-height: 1.5;
+                        -moz-tab-size: 4;
+                        -o-tab-size: 4;
+                        tab-size: 4;
+                        -webkit-hyphens: none;
+                        -moz-hyphens: none;
+                        -ms-hyphens: none;
+                        hyphens: none;
+                    }
+
+                    .token.comment, .token.prolog, .token.doctype, .token.cdata { color: #8292a2; font-style: italic; }
+                    .token.namespace { opacity: .7; }
+                    .token.string, .token.attr-value { color: #e6db74; }
+                    .token.punctuation, .token.operator { color: #f8f8f2; }
+                    .token.entity, .token.url, .token.symbol, .token.number, .token.boolean { color: #ae81ff; }
+                    .token.property, .token.tag, .token.deleted, .token.constant { color: #f92672; }
+                    .token.function, .token.class-name { color: #a6e22e; }
+                    .token.keyword, .token.atrule, .token.selector, .token.builtin { color: #66d9ef; font-weight: bold; }
+                    .token.regex, .token.important, .token.variable { color: #fd971f; }
+                    .token.important, .token.bold { font-weight: bold; }
+                    .token.italic { font-style: italic; }
 
                     body {
                         background-color: #0d0d0d;
@@ -381,10 +420,15 @@ class RendererPanel {
                             const lineNumbers = document.querySelector('.line-numbers');
                             
                             // Update dynamic language classes
-                            const languageMap = {
-                                'js': 'javascript', 'ts': 'typescript', 'py': 'python', 'md': 'markdown',
-                                'c': 'clike', 'cpp': 'cpp', 'cs': 'csharp', 'java': 'java',
-                                'php': 'php', 'go': 'go', 'rs': 'rust', 'sql': 'sql'
+                            const languageMap: { [key: string]: string } = {
+                                'js': 'javascript', 'javascript': 'javascript',
+                                'ts': 'typescript', 'typescript': 'typescript',
+                                'py': 'python', 'python': 'python',
+                                'md': 'markdown', 'markdown': 'markdown',
+                                'c': 'clike', 'cpp': 'cpp', 'cs': 'csharp', 'csharp': 'csharp',
+                                'java': 'java', 'php': 'php', 'go': 'go', 'rs': 'rust', 'rust': 'rust',
+                                'sql': 'sql', 'html': 'markup', 'xml': 'markup', 'css': 'css',
+                                'json': 'javascript', 'yaml': 'yaml', 'bash': 'bash'
                             };
                             const lang = languageMap[message.languageId] || message.languageId;
                             preElement.className = 'language-' + lang;
@@ -471,12 +515,33 @@ class RendererPanel {
                             imageTimeout: 0,
                             removeContainer: true,
                             onclone: (clonedDoc) => {
-                                // Ensure the cloned area is NOT scaled during capture
-                                const clonedScaler = clonedDoc.getElementById('scaler');
-                                if (clonedScaler) clonedScaler.style.transform = 'none';
-                                
+                                // Double check the cloned DOM for colors
                                 const clonedArea = clonedDoc.getElementById('capture-area');
                                 clonedArea.style.userSelect = 'none';
+                                
+                                // Ensure the scaler is removed to avoid weird cropping
+                                const clonedScaler = clonedDoc.getElementById('scaler');
+                                if (clonedScaler) {
+                                    clonedScaler.style.transform = 'none';
+                                    clonedScaler.style.width = 'auto';
+                                    clonedScaler.style.height = 'auto';
+                                }
+
+                                // High fidelity - Inline the computed colors into the clone
+                                // This is the ONLY way to guarantee html2canvas sees them
+                                const originalArea = document.getElementById('capture-area');
+                                const originalTokens = originalArea.querySelectorAll('.token');
+                                const clonedTokens = clonedArea.querySelectorAll('.token');
+                                
+                                clonedTokens.forEach((token, idx) => {
+                                    const originalToken = originalTokens[idx];
+                                    if (originalToken) {
+                                        const style = window.getComputedStyle(originalToken);
+                                        token.style.color = style.color;
+                                        token.style.fontWeight = style.fontWeight;
+                                        token.style.fontStyle = style.fontStyle;
+                                    }
+                                });
                             }
                         }).then(canvas => {
                             const data = canvas.toDataURL('image/jpeg', 0.95);

@@ -105,22 +105,30 @@ export class RendererPanel {
         
         const languageMap: { [key: string]: string } = {
             'js': 'javascript',
+            'javascript': 'javascript',
             'ts': 'typescript',
+            'typescript': 'typescript',
             'py': 'python',
+            'python': 'python',
             'md': 'markdown',
+            'markdown': 'markdown',
             'c': 'clike',
-            'h': 'clike',
             'cpp': 'cpp',
-            'hpp': 'cpp',
+            'csharp': 'csharp',
             'cs': 'csharp',
             'java': 'java',
             'php': 'php',
-            'rb': 'ruby',
             'go': 'go',
             'rs': 'rust',
+            'rust': 'rust',
             'sql': 'sql',
             'html': 'markup',
-            'xml': 'markup'
+            'xml': 'markup',
+            'css': 'css',
+            'json': 'javascript', // Fallback to JS for JSON if needed
+            'yaml': 'yaml',
+            'sh': 'bash',
+            'bash': 'bash'
         };
         const language = languageMap[selection.languageId] || selection.languageId;
         
@@ -401,10 +409,15 @@ export class RendererPanel {
                             const lineNumbers = document.querySelector('.line-numbers');
                             
                             // Update dynamic language classes
-                            const languageMap = {
-                                'js': 'javascript', 'ts': 'typescript', 'py': 'python', 'md': 'markdown',
-                                'c': 'clike', 'cpp': 'cpp', 'cs': 'csharp', 'java': 'java',
-                                'php': 'php', 'go': 'go', 'rs': 'rust', 'sql': 'sql'
+                            const languageMap: { [key: string]: string } = {
+                                'js': 'javascript', 'javascript': 'javascript',
+                                'ts': 'typescript', 'typescript': 'typescript',
+                                'py': 'python', 'python': 'python',
+                                'md': 'markdown', 'markdown': 'markdown',
+                                'c': 'clike', 'cpp': 'cpp', 'cs': 'csharp', 'csharp': 'csharp',
+                                'java': 'java', 'php': 'php', 'go': 'go', 'rs': 'rust', 'rust': 'rust',
+                                'sql': 'sql', 'html': 'markup', 'xml': 'markup', 'css': 'css',
+                                'json': 'javascript', 'yaml': 'yaml', 'bash': 'bash'
                             };
                             const lang = languageMap[message.languageId] || message.languageId;
                             preElement.className = 'language-' + lang;
@@ -503,13 +516,19 @@ export class RendererPanel {
                                     clonedScaler.style.height = 'auto';
                                 }
 
-                                // High fidelity - Ensure tokens have visible colors in the clone
-                                const tokens = clonedDoc.querySelectorAll('.token');
-                                tokens.forEach(token => {
-                                    const style = window.getComputedStyle(token);
-                                    if (style.color) {
+                                // High fidelity - Inline the computed colors into the clone
+                                // This is the ONLY way to guarantee html2canvas sees them
+                                const originalArea = document.getElementById('capture-area');
+                                const originalTokens = originalArea.querySelectorAll('.token');
+                                const clonedTokens = clonedArea.querySelectorAll('.token');
+                                
+                                clonedTokens.forEach((token, idx) => {
+                                    const originalToken = originalTokens[idx];
+                                    if (originalToken) {
+                                        const style = window.getComputedStyle(originalToken);
                                         token.style.color = style.color;
                                         token.style.fontWeight = style.fontWeight;
+                                        token.style.fontStyle = style.fontStyle;
                                     }
                                 });
                             }
