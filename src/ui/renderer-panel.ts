@@ -51,12 +51,8 @@ export class RendererPanel {
     }
 
     public update(selection: CodeSelection) {
-        this._panel.webview.postMessage({
-            command: 'updateSelection',
-            text: selection.text,
-            startLine: selection.startLine,
-            languageId: selection.languageId
-        });
+        // Full re-render for reliable color/highlight updates
+        this._update(selection);
     }
 
     private async _saveImage(base64Data: string) {
@@ -125,7 +121,7 @@ export class RendererPanel {
             'html': 'markup',
             'xml': 'markup',
             'css': 'css',
-            'json': 'javascript', // Fallback to JS for JSON if needed
+            'json': 'javascript',
             'yaml': 'yaml',
             'sh': 'bash',
             'bash': 'bash'
@@ -144,10 +140,10 @@ export class RendererPanel {
                 <script src="${prismJsUri}"></script>
                 <script src="${html2canvasUri}"></script>
                 <style>
-                    /* Premium Syntax Highlighting - Optimized for Capture */
+                    /* Premium Syntax Highlighting - Ultra Vibrant Neon */
                     code[class*="language-"], 
                     pre[class*="language-"] {
-                        color: #f8f8f2;
+                        color: #e4e4e7;
                         background: none !important;
                         font-family: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace;
                         font-size: 14px;
@@ -156,7 +152,7 @@ export class RendererPanel {
                         white-space: pre;
                         word-spacing: normal;
                         word-break: normal;
-                        line-height: 1.5;
+                        line-height: 1.6;
                         -moz-tab-size: 4;
                         -o-tab-size: 4;
                         tab-size: 4;
@@ -166,27 +162,108 @@ export class RendererPanel {
                         hyphens: none;
                     }
 
-                    /* 🎨 Vibrant Syntax Highlighting Theme */
-                    .token.comment, .token.prolog, .token.doctype, .token.cdata { color: #7c8da6; font-style: italic; }
-                    .token.namespace { opacity: .8; }
-                    .token.string, .token.attr-value { color: #50fa7b; }
-                    .token.punctuation { color: #e0e0e0; }
-                    .token.operator { color: #ff79c6; }
-                    .token.entity, .token.url, .token.symbol { color: #ffb86c; }
-                    .token.number { color: #bd93f9; }
-                    .token.boolean { color: #bd93f9; font-weight: bold; }
-                    .token.property, .token.constant { color: #ff6e6e; }
-                    .token.tag { color: #ff79c6; }
-                    .token.deleted { color: #ff5555; text-decoration: line-through; }
-                    .token.inserted { color: #50fa7b; }
-                    .token.function { color: #66d9ef; font-weight: bold; }
-                    .token.class-name { color: #8be9fd; font-style: italic; }
-                    .token.keyword { color: #ff79c6; font-weight: bold; }
-                    .token.atrule, .token.selector { color: #50fa7b; }
-                    .token.builtin, .token.char { color: #8be9fd; }
-                    .token.attr-name { color: #ffb86c; font-style: italic; }
-                    .token.regex { color: #f1fa8c; }
-                    .token.important, .token.variable { color: #ffb86c; }
+                    /* 🎨 Ultra-Vibrant Neon Syntax Colors */
+                    .token.comment, .token.prolog, .token.doctype, .token.cdata {
+                        color: #6b7994;
+                        font-style: italic;
+                    }
+                    .token.namespace { opacity: .85; }
+
+                    /* Strings — Electric Lime Green */
+                    .token.string, .token.attr-value {
+                        color: #a8ff60;
+                    }
+
+                    /* Punctuation — Soft White */
+                    .token.punctuation {
+                        color: #cdd6e4;
+                    }
+
+                    /* Operators — Hot Pink */
+                    .token.operator {
+                        color: #ff9ac1;
+                    }
+
+                    /* Entities, URLs, Symbols — Hot Orange */
+                    .token.entity, .token.url, .token.symbol {
+                        color: #ff9d00;
+                    }
+
+                    /* Numbers — Ultraviolet Purple */
+                    .token.number {
+                        color: #c792ea;
+                    }
+
+                    /* Booleans — Purple with bold */
+                    .token.boolean {
+                        color: #c792ea;
+                        font-weight: bold;
+                    }
+
+                    /* Properties, Constants — Coral Red */
+                    .token.property, .token.constant {
+                        color: #ff6e6e;
+                    }
+
+                    /* Tags — Coral Flame */
+                    .token.tag {
+                        color: #ff6188;
+                    }
+
+                    /* Deleted — Red strikethrough */
+                    .token.deleted {
+                        color: #ff5555;
+                        text-decoration: line-through;
+                    }
+
+                    /* Inserted — Green */
+                    .token.inserted {
+                        color: #a8ff60;
+                    }
+
+                    /* Functions — Vivid Cyan */
+                    .token.function {
+                        color: #25c9ff;
+                        font-weight: bold;
+                    }
+
+                    /* Class names — Aqua Blue Italic */
+                    .token.class-name {
+                        color: #78dce8;
+                        font-style: italic;
+                    }
+
+                    /* Keywords — Neon Magenta */
+                    .token.keyword {
+                        color: #ff2d76;
+                        font-weight: bold;
+                    }
+
+                    /* At-rules, Selectors — Lime */
+                    .token.atrule, .token.selector {
+                        color: #a8ff60;
+                    }
+
+                    /* Builtins, Chars — Aqua */
+                    .token.builtin, .token.char {
+                        color: #78dce8;
+                    }
+
+                    /* Attr names — Orange Italic */
+                    .token.attr-name {
+                        color: #ffb86c;
+                        font-style: italic;
+                    }
+
+                    /* Regex — Sunbeam Yellow */
+                    .token.regex {
+                        color: #ffd866;
+                    }
+
+                    /* Important, Variables — Hot Orange */
+                    .token.important, .token.variable {
+                        color: #ff9d00;
+                    }
                     .token.important, .token.bold { font-weight: bold; }
                     .token.italic { font-style: italic; }
 
@@ -226,7 +303,7 @@ export class RendererPanel {
                         justify-content: center;
                         align-items: center;
                         width: 100%;
-                        height: calc(100vh - 80px); /* Account for toolbar */
+                        height: calc(100vh - 80px);
                         margin-top: 80px;
                         overflow: hidden;
                     }
@@ -302,6 +379,8 @@ export class RendererPanel {
                     #capture-area.gradient-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
                     #capture-area.gradient-3 { background: linear-gradient(135deg, #5ee7df 0%, #b490ca 100%); }
                     #capture-area.gradient-4 { background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); }
+                    #capture-area.gradient-5 { background: linear-gradient(135deg, #fc5c7d 0%, #6a82fb 100%); }
+                    #capture-area.gradient-6 { background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%); }
 
                     .window-frame {
                         background-color: var(--vscode-editor-background);
@@ -356,13 +435,12 @@ export class RendererPanel {
                         margin: 0;
                         white-space: pre;
                         font-family: inherit;
-                        background: transparent !important; /* Force transparent background */
+                        background: transparent !important;
                     }
                     code {
                         font-family: inherit;
                         background: transparent !important;
                     }
-                    /* Remove any potential selection background on capture */
                     ::selection {
                         background: transparent !important;
                     }
@@ -387,6 +465,8 @@ export class RendererPanel {
                             <option value="gradient-2">Sunset</option>
                             <option value="gradient-3">Sea</option>
                             <option value="gradient-4">Sky</option>
+                            <option value="gradient-5">Candy</option>
+                            <option value="gradient-6">Mint</option>
                         </select>
                     </div>
                     <button class="primary" onclick="capture()">Capture</button>
@@ -411,75 +491,35 @@ export class RendererPanel {
                     </div>
                 </div>
                 <script>
-                    const vscode = acquireVsCodeApi();
+                    var vscode = acquireVsCodeApi();
                     
-                    window.addEventListener('message', event => {
-                        const message = event.data;
-                        if (message.command === 'updateSelection') {
-                            const codeElement = document.querySelector('pre code');
-                            const preElement = document.querySelector('pre');
-                            const lineNumbers = document.querySelector('.line-numbers');
-                            
-                            // Update dynamic language classes
-                            const languageMap: { [key: string]: string } = {
-                                'js': 'javascript', 'javascript': 'javascript',
-                                'ts': 'typescript', 'typescript': 'typescript',
-                                'py': 'python', 'python': 'python',
-                                'md': 'markdown', 'markdown': 'markdown',
-                                'c': 'clike', 'cpp': 'cpp', 'cs': 'csharp', 'csharp': 'csharp',
-                                'java': 'java', 'php': 'php', 'go': 'go', 'rs': 'rust', 'rust': 'rust',
-                                'sql': 'sql', 'html': 'markup', 'xml': 'markup', 'css': 'css',
-                                'json': 'javascript', 'yaml': 'yaml', 'bash': 'bash'
-                            };
-                            const lang = languageMap[message.languageId] || message.languageId;
-                            preElement.className = 'language-' + lang;
-                            codeElement.className = 'language-' + lang;
-
-                            // Update code
-                            codeElement.textContent = message.text;
-                            
-                            // Highlight
-                            if (window.Prism) {
-                                Prism.highlightElement(codeElement);
-                            }
-
-                            // Update line numbers
-                            const lines = message.text.split('\\n');
-                            const lineNumbersHtml = lines.map((_, i) => \`<div>\${message.startLine + i + 1}</div>\`).join('');
-                            lineNumbers.innerHTML = lineNumbersHtml;
-
-                            // Re-calculate scale after update
-                            setTimeout(updateScale, 50);
-                        }
-                    });
-
-                    // Trigger highlight on initial load
-                    document.addEventListener('DOMContentLoaded', () => {
+                    // Trigger highlight on load
+                    document.addEventListener('DOMContentLoaded', function() {
                         if (window.Prism) {
                             Prism.highlightAll();
                         }
                     });
                     
-                    // Fallback for immediate highlight if DOMContentLoaded already fired
-                    setTimeout(() => {
-                        if (window.Prism) Prism.highlightAll();
+                    // Fallback immediate highlight
+                    setTimeout(function() {
+                        if (window.Prism) { Prism.highlightAll(); }
                         updateScale();
                     }, 100);
 
                     function updateScale() {
-                        const wrapper = document.getElementById('scaler-wrapper');
-                        const scaler = document.getElementById('scaler');
-                        const area = document.getElementById('capture-area');
+                        var wrapper = document.getElementById('scaler-wrapper');
+                        var scaler = document.getElementById('scaler');
+                        var area = document.getElementById('capture-area');
                         
-                        const pad = 40; // Some breathing room
-                        const availableWidth = wrapper.clientWidth - pad;
-                        const availableHeight = wrapper.clientHeight - pad;
+                        var pad = 40;
+                        var availableWidth = wrapper.clientWidth - pad;
+                        var availableHeight = wrapper.clientHeight - pad;
                         
-                        const scaleX = availableWidth / area.offsetWidth;
-                        const scaleY = availableHeight / area.offsetHeight;
-                        const scale = Math.min(1, scaleX, scaleY);
+                        var scaleX = availableWidth / area.offsetWidth;
+                        var scaleY = availableHeight / area.offsetHeight;
+                        var scale = Math.min(1, scaleX, scaleY);
                         
-                        scaler.style.transform = \`scale(\${scale})\`;
+                        scaler.style.transform = 'scale(' + scale + ')';
                     }
 
                     window.addEventListener('resize', updateScale);
@@ -487,20 +527,21 @@ export class RendererPanel {
 
                     function updatePadding(val) {
                         document.getElementById('capture-area').style.padding = val;
+                        setTimeout(updateScale, 50);
                     }
                     
                     function updateBg(val) {
-                        const area = document.getElementById('capture-area');
-                        area.classList.remove('gradient-1', 'gradient-2', 'gradient-3', 'gradient-4');
+                        var area = document.getElementById('capture-area');
+                        area.classList.remove('gradient-1', 'gradient-2', 'gradient-3', 'gradient-4', 'gradient-5', 'gradient-6');
                         if (val !== 'default') {
                             area.classList.add(val);
                         }
                     }
 
                     function capture() {
-                        const area = document.getElementById('capture-area');
-                        const btn = document.querySelector('button.primary');
-                        const originalText = btn.innerText;
+                        var area = document.getElementById('capture-area');
+                        var btn = document.querySelector('button.primary');
+                        var originalText = btn.innerText;
                         
                         btn.innerText = 'Capturing...';
                         btn.disabled = true;
@@ -510,49 +551,46 @@ export class RendererPanel {
 
                         html2canvas(area, {
                             backgroundColor: null,
-                            scale: 3, // Increased for ultra-high quality
+                            scale: 3,
                             logging: false,
                             useCORS: true,
                             imageTimeout: 0,
                             removeContainer: true,
-                            onclone: (clonedDoc) => {
-                                // Double check the cloned DOM for colors
-                                const clonedArea = clonedDoc.getElementById('capture-area');
+                            onclone: function(clonedDoc) {
+                                var clonedArea = clonedDoc.getElementById('capture-area');
                                 clonedArea.style.userSelect = 'none';
                                 
-                                // Ensure the scaler is removed to avoid weird cropping
-                                const clonedScaler = clonedDoc.getElementById('scaler');
+                                var clonedScaler = clonedDoc.getElementById('scaler');
                                 if (clonedScaler) {
                                     clonedScaler.style.transform = 'none';
                                     clonedScaler.style.width = 'auto';
                                     clonedScaler.style.height = 'auto';
                                 }
 
-                                // High fidelity - Inline the computed colors into the clone
-                                // This is the ONLY way to guarantee html2canvas sees them
-                                const originalArea = document.getElementById('capture-area');
-                                const originalTokens = originalArea.querySelectorAll('.token');
-                                const clonedTokens = clonedArea.querySelectorAll('.token');
+                                // Inline computed colors for html2canvas fidelity
+                                var originalArea = document.getElementById('capture-area');
+                                var originalTokens = originalArea.querySelectorAll('.token');
+                                var clonedTokens = clonedArea.querySelectorAll('.token');
                                 
-                                clonedTokens.forEach((token, idx) => {
-                                    const originalToken = originalTokens[idx];
+                                clonedTokens.forEach(function(token, idx) {
+                                    var originalToken = originalTokens[idx];
                                     if (originalToken) {
-                                        const style = window.getComputedStyle(originalToken);
+                                        var style = window.getComputedStyle(originalToken);
                                         token.style.color = style.color;
                                         token.style.fontWeight = style.fontWeight;
                                         token.style.fontStyle = style.fontStyle;
                                     }
                                 });
                             }
-                        }).then(canvas => {
-                            const data = canvas.toDataURL('image/jpeg', 0.95);
+                        }).then(function(canvas) {
+                            var data = canvas.toDataURL('image/jpeg', 0.95);
                             vscode.postMessage({
                                 command: 'capture',
                                 data: data
                             });
                             btn.innerText = originalText;
                             btn.disabled = false;
-                        }).catch(err => {
+                        }).catch(function(err) {
                             vscode.postMessage({
                                 command: 'showError',
                                 text: 'Failed to capture: ' + err.message

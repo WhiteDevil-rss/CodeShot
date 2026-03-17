@@ -40,6 +40,7 @@ const extractor_1 = require("./core/extractor");
 const renderer_panel_1 = require("./ui/renderer-panel");
 function activate(context) {
     console.log('Congratulations, your extension "codeshot" is now active!');
+    // Manual command trigger (context menu / command palette only)
     let disposable = vscode.commands.registerCommand('codeshot.capture', () => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
@@ -52,14 +53,25 @@ function activate(context) {
         }
         renderer_panel_1.RendererPanel.createOrShow(context.extensionUri, selection);
     });
-    // Live Update Listener
+    // Live update listener — only updates if panel is already open
+    let debounceTimer;
     let selectionListener = vscode.window.onDidChangeTextEditorSelection((e) => {
-        if (renderer_panel_1.RendererPanel.currentPanel && e.textEditor === vscode.window.activeTextEditor) {
+        // Only update if panel is already open (don't auto-open)
+        if (!renderer_panel_1.RendererPanel.currentPanel) {
+            return;
+        }
+        if (e.textEditor !== vscode.window.activeTextEditor) {
+            return;
+        }
+        if (debounceTimer) {
+            clearTimeout(debounceTimer);
+        }
+        debounceTimer = setTimeout(() => {
             const selection = (0, extractor_1.extractSelection)(e.textEditor);
             if (selection) {
-                renderer_panel_1.RendererPanel.currentPanel.update(selection);
+                renderer_panel_1.RendererPanel.currentPanel?.update(selection);
             }
-        }
+        }, 300);
     });
     context.subscriptions.push(disposable, selectionListener);
 }
