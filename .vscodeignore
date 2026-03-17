@@ -1,0 +1,16 @@
+.gitignore
+.vscode/**
+.vscode-test/**
+out/test/**
+src/**
+files/**
+tsconfig.json
+MVP_Tech_Doc.md
+PRD.md
+System_Design.md
+architecture.md
+.DS_Store
+package-lock.json
+vsc-extension-quickstart.md
+node_modules/**
+**/.*
