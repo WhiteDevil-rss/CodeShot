@@ -100,36 +100,20 @@ export class RendererPanel {
         const html2canvasUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'html2canvas.min.js'));
         
         const languageMap: { [key: string]: string } = {
-            'js': 'javascript',
-            'javascript': 'javascript',
-            'ts': 'typescript',
-            'typescript': 'typescript',
-            'py': 'python',
-            'python': 'python',
-            'md': 'markdown',
-            'markdown': 'markdown',
-            'c': 'clike',
-            'cpp': 'cpp',
-            'csharp': 'csharp',
-            'cs': 'csharp',
-            'java': 'java',
-            'php': 'php',
-            'go': 'go',
-            'rs': 'rust',
-            'rust': 'rust',
-            'sql': 'sql',
-            'html': 'markup',
-            'xml': 'markup',
-            'css': 'css',
-            'json': 'javascript',
-            'yaml': 'yaml',
-            'sh': 'bash',
-            'bash': 'bash'
+            'js': 'javascript', 'javascript': 'javascript',
+            'ts': 'typescript', 'typescript': 'typescript',
+            'py': 'python', 'python': 'python',
+            'md': 'markdown', 'markdown': 'markdown',
+            'c': 'clike', 'cpp': 'cpp', 'csharp': 'csharp', 'cs': 'csharp',
+            'java': 'java', 'php': 'php', 'go': 'go', 'rs': 'rust', 'rust': 'rust',
+            'sql': 'sql', 'html': 'markup', 'xml': 'markup', 'css': 'css',
+            'json': 'javascript', 'yaml': 'yaml', 'sh': 'bash', 'bash': 'bash'
         };
         const language = languageMap[selection.languageId] || selection.languageId;
         
         const lines = selection.text.split('\n');
-        const lineNumbersHtml = lines.map((_, i) => `<div>${selection.startLine + i + 1}</div>`).join('');
+        // Add exact height constraint to line numbers to perfectly match the code
+        const lineNumbersHtml = lines.map((_, i) => `<div style="height: 1.6em;">${selection.startLine + i + 1}</div>`).join('');
 
         return `
             <!DOCTYPE html>
@@ -152,6 +136,7 @@ export class RendererPanel {
                         white-space: pre;
                         word-spacing: normal;
                         word-break: normal;
+                        /* Explicit line-height matched everywhere */
                         line-height: 1.6;
                         -moz-tab-size: 4;
                         -o-tab-size: 4;
@@ -160,112 +145,36 @@ export class RendererPanel {
                         -moz-hyphens: none;
                         -ms-hyphens: none;
                         hyphens: none;
+                        margin: 0;
                     }
 
                     /* 🎨 Ultra-Vibrant Neon Syntax Colors */
                     .token.comment, .token.prolog, .token.doctype, .token.cdata {
-                        color: #6b7994;
-                        font-style: italic;
+                        color: #6b7994 !important;
+                        font-style: italic !important;
                     }
-                    .token.namespace { opacity: .85; }
+                    .token.namespace { opacity: .85 !important; }
 
-                    /* Strings — Electric Lime Green */
-                    .token.string, .token.attr-value {
-                        color: #a8ff60;
-                    }
-
-                    /* Punctuation — Soft White */
-                    .token.punctuation {
-                        color: #cdd6e4;
-                    }
-
-                    /* Operators — Hot Pink */
-                    .token.operator {
-                        color: #ff9ac1;
-                    }
-
-                    /* Entities, URLs, Symbols — Hot Orange */
-                    .token.entity, .token.url, .token.symbol {
-                        color: #ff9d00;
-                    }
-
-                    /* Numbers — Ultraviolet Purple */
-                    .token.number {
-                        color: #c792ea;
-                    }
-
-                    /* Booleans — Purple with bold */
-                    .token.boolean {
-                        color: #c792ea;
-                        font-weight: bold;
-                    }
-
-                    /* Properties, Constants — Coral Red */
-                    .token.property, .token.constant {
-                        color: #ff6e6e;
-                    }
-
-                    /* Tags — Coral Flame */
-                    .token.tag {
-                        color: #ff6188;
-                    }
-
-                    /* Deleted — Red strikethrough */
-                    .token.deleted {
-                        color: #ff5555;
-                        text-decoration: line-through;
-                    }
-
-                    /* Inserted — Green */
-                    .token.inserted {
-                        color: #a8ff60;
-                    }
-
-                    /* Functions — Vivid Cyan */
-                    .token.function {
-                        color: #25c9ff;
-                        font-weight: bold;
-                    }
-
-                    /* Class names — Aqua Blue Italic */
-                    .token.class-name {
-                        color: #78dce8;
-                        font-style: italic;
-                    }
-
-                    /* Keywords — Neon Magenta */
-                    .token.keyword {
-                        color: #ff2d76;
-                        font-weight: bold;
-                    }
-
-                    /* At-rules, Selectors — Lime */
-                    .token.atrule, .token.selector {
-                        color: #a8ff60;
-                    }
-
-                    /* Builtins, Chars — Aqua */
-                    .token.builtin, .token.char {
-                        color: #78dce8;
-                    }
-
-                    /* Attr names — Orange Italic */
-                    .token.attr-name {
-                        color: #ffb86c;
-                        font-style: italic;
-                    }
-
-                    /* Regex — Sunbeam Yellow */
-                    .token.regex {
-                        color: #ffd866;
-                    }
-
-                    /* Important, Variables — Hot Orange */
-                    .token.important, .token.variable {
-                        color: #ff9d00;
-                    }
-                    .token.important, .token.bold { font-weight: bold; }
-                    .token.italic { font-style: italic; }
+                    .token.string, .token.attr-value { color: #a8ff60 !important; }
+                    .token.punctuation { color: #cdd6e4 !important; }
+                    .token.operator { color: #ff9ac1 !important; }
+                    .token.entity, .token.url, .token.symbol { color: #ff9d00 !important; }
+                    .token.number { color: #c792ea !important; }
+                    .token.boolean { color: #c792ea !important; font-weight: bold !important; }
+                    .token.property, .token.constant { color: #ff6e6e !important; }
+                    .token.tag { color: #ff6188 !important; }
+                    .token.deleted { color: #ff5555 !important; text-decoration: line-through !important; }
+                    .token.inserted { color: #a8ff60 !important; }
+                    .token.function { color: #25c9ff !important; font-weight: bold !important; }
+                    .token.class-name { color: #78dce8 !important; font-style: italic !important; }
+                    .token.keyword { color: #ff2d76 !important; font-weight: bold !important; }
+                    .token.atrule, .token.selector { color: #a8ff60 !important; }
+                    .token.builtin, .token.char { color: #78dce8 !important; }
+                    .token.attr-name { color: #ffb86c !important; font-style: italic !important; }
+                    .token.regex { color: #ffd866 !important; }
+                    .token.important, .token.variable { color: #ff9d00 !important; }
+                    .token.important, .token.bold { font-weight: bold !important; }
+                    .token.italic { font-style: italic !important; }
 
                     body {
                         background-color: #0d0d0d;
@@ -383,8 +292,8 @@ export class RendererPanel {
                     #capture-area.gradient-6 { background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%); }
 
                     .window-frame {
-                        background-color: var(--vscode-editor-background);
-                        color: var(--vscode-editor-foreground);
+                        background-color: var(--vscode-editor-background, #1e1e1e);
+                        color: var(--vscode-editor-foreground, #d4d4d4);
                         border-radius: 12px;
                         box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
                         overflow: hidden;
@@ -417,18 +326,27 @@ export class RendererPanel {
                     .code-body {
                         display: flex;
                         padding: 10px 24px 30px 24px;
-                        font-family: var(--vscode-editor-font-family);
-                        font-size: var(--vscode-editor-font-size);
+                        font-family: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace;
+                        font-size: 14px;
                         line-height: 1.6;
                     }
                     
                     .line-numbers {
                         text-align: right;
                         padding-right: 28px;
-                        color: var(--vscode-editorLineNumber-foreground, #858585);
+                        color: rgba(255,255,255,0.4);
                         user-select: none;
-                        opacity: 0.4;
                         font-variant-numeric: tabular-nums;
+                        display: flex;
+                        flex-direction: column;
+                        /* Match exactly with the pre/code font settings */
+                        font-family: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace;
+                        font-size: 14px;
+                        line-height: 1.6;
+                        /* Prevent it from misaligning via padding or margin */
+                        margin: 0;
+                        padding-top: 0;
+                        padding-bottom: 0;
                     }
                     
                     pre {
@@ -538,6 +456,18 @@ export class RendererPanel {
                         }
                     }
 
+                    // Explicitly pull colors for html2canvas
+                    function copyStyles(src, dest) {
+                        var style = window.getComputedStyle(src);
+                        dest.style.color = style.color;
+                        dest.style.backgroundColor = style.backgroundColor;
+                        dest.style.fontWeight = style.fontWeight;
+                        dest.style.fontStyle = style.fontStyle;
+                        dest.style.fontFamily = style.fontFamily;
+                        dest.style.fontSize = style.fontSize;
+                        dest.style.lineHeight = style.lineHeight;
+                    }
+
                     function capture() {
                         var area = document.getElementById('capture-area');
                         var btn = document.querySelector('button.primary');
@@ -549,11 +479,27 @@ export class RendererPanel {
                         // Ensure no text is selected before capture
                         window.getSelection().removeAllRanges();
 
+                        // Pre-process before cloning: explicitly bake all tokens into inline styles on the REAL dom
+                        // HTML2Canvas struggles with external stylesheets loaded inside webviews
+                        var tokens = area.querySelectorAll('.token, .line-numbers, .window-frame, .code-body, pre, code');
+                        tokens.forEach(function(token) {
+                            var style = window.getComputedStyle(token);
+                            token.style.setProperty('color', style.color, 'important');
+                            token.style.setProperty('font-style', style.fontStyle, 'important');
+                            token.style.setProperty('font-weight', style.fontWeight, 'important');
+                            token.style.setProperty('background', style.background, 'important');
+                            token.style.setProperty('background-color', style.backgroundColor, 'important');
+                            token.style.setProperty('font-family', style.fontFamily, 'important');
+                            token.style.setProperty('font-size', style.fontSize, 'important');
+                            token.style.setProperty('line-height', style.lineHeight, 'important');
+                        });
+
                         html2canvas(area, {
                             backgroundColor: null,
                             scale: 3,
                             logging: false,
                             useCORS: true,
+                            allowTaint: true,
                             imageTimeout: 0,
                             removeContainer: true,
                             onclone: function(clonedDoc) {
@@ -566,23 +512,20 @@ export class RendererPanel {
                                     clonedScaler.style.width = 'auto';
                                     clonedScaler.style.height = 'auto';
                                 }
-
-                                // Inline computed colors for html2canvas fidelity
-                                var originalArea = document.getElementById('capture-area');
-                                var originalTokens = originalArea.querySelectorAll('.token');
-                                var clonedTokens = clonedArea.querySelectorAll('.token');
-                                
-                                clonedTokens.forEach(function(token, idx) {
-                                    var originalToken = originalTokens[idx];
-                                    if (originalToken) {
-                                        var style = window.getComputedStyle(originalToken);
-                                        token.style.color = style.color;
-                                        token.style.fontWeight = style.fontWeight;
-                                        token.style.fontStyle = style.fontStyle;
-                                    }
-                                });
                             }
                         }).then(function(canvas) {
+                            // Clean up our inline styles from the real DOM
+                            tokens.forEach(function(token) {
+                                token.style.removeProperty('color');
+                                token.style.removeProperty('font-style');
+                                token.style.removeProperty('font-weight');
+                                token.style.removeProperty('background');
+                                token.style.removeProperty('background-color');
+                                token.style.removeProperty('font-family');
+                                token.style.removeProperty('font-size');
+                                token.style.removeProperty('line-height');
+                            });
+
                             var data = canvas.toDataURL('image/jpeg', 0.95);
                             vscode.postMessage({
                                 command: 'capture',
@@ -603,6 +546,7 @@ export class RendererPanel {
             </body>
             </html>
         `;
+
     }
 
     private _escapeHtml(unsafe: string) {
